@@ -1,0 +1,236 @@
+// Desafio Batalha Naval
+#include <stdio.h>
+#include <stdlib.h> // Para a função abs()
+
+// Função para verificar se o posicionamento do navio é válido
+int validarPosicao(char tabuleiro[10][10], int x, int y, int tamanho, char orientacao)
+{
+    if (orientacao == 'H')
+    { // Horizontal
+        if (y + tamanho > 10)
+            return 0; // Fora dos limites
+        for (int i = 0; i < tamanho; i++)
+        {
+            if (tabuleiro[x][y + i] != '0')
+                return 0; // Sobreposição
+        }
+    }
+    else if (orientacao == 'V')
+    { // Vertical
+        if (x + tamanho > 10)
+            return 0; // Fora dos limites
+        for (int i = 0; i < tamanho; i++)
+        {
+            if (tabuleiro[x + i][y] != '0')
+                return 0; // Sobreposição
+        }
+    }
+    return 1; // Posição válida
+}
+
+// Função para posicionar o navio no tabuleiro
+void posicionarNavio(char tabuleiro[10][10], int x, int y, int tamanho, char orientacao)
+{
+    if (orientacao == 'H')
+    { // Horizontal
+        for (int i = 0; i < tamanho; i++)
+        {
+            tabuleiro[x][y + i] = '3';
+        }
+    }
+    else if (orientacao == 'V')
+    { // Vertical
+        for (int i = 0; i < tamanho; i++)
+        {
+            tabuleiro[x + i][y] = '3';
+        }
+    }
+}
+
+// Função para verificar se o posicionamento do navio diagonal é válido
+int validarPosicaoDiagonal(char tabuleiro[10][10], int x, int y, int tamanho, char direcao)
+{
+    if (direcao == 'D')
+    { // Diagonal principal ↘
+        if (x + tamanho > 10 || y + tamanho > 10)
+            return 0; // Fora dos limites
+        for (int i = 0; i < tamanho; i++)
+        {
+            if (tabuleiro[x + i][y + i] != '0')
+                return 0; // Sobreposição
+        }
+    }
+    else if (direcao == 'E')
+    { // Diagonal secundária ↙
+        if (x + tamanho > 10 || y - tamanho + 1 < 0)
+            return 0; // Fora dos limites
+        for (int i = 0; i < tamanho; i++)
+        {
+            if (tabuleiro[x + i][y - i] != '0')
+                return 0; // Sobreposição
+        }
+    }
+    return 1; // Posição válida
+}
+
+// Função para posicionar o navio diagonal no tabuleiro
+void posicionarNavioDiagonal(char tabuleiro[10][10], int x, int y, int tamanho, char direcao)
+{
+    if (direcao == 'D')
+    { // Diagonal principal ↘
+        for (int i = 0; i < tamanho; i++)
+        {
+            tabuleiro[x + i][y + i] = '3';
+        }
+    }
+    else if (direcao == 'E')
+    { // Diagonal secundária ↙
+        for (int i = 0; i < tamanho; i++)
+        {
+            tabuleiro[x + i][y - i] = '3';
+        }
+    }
+}
+
+// Função para sobrepor matriz de habilidade ao tabuleiro
+void aplicarHabilidade(char tabuleiro[10][10], int habilidade[5][5], int origemX, int origemY) {
+    // Percorre a matriz de habilidade 5x5
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            // Calcula a posição correspondente no tabuleiro
+            int tabX = origemX - 2 + i;
+            int tabY = origemY - 2 + j;
+            // Verifica se está dentro dos limites do tabuleiro
+            if (tabX >= 0 && tabX < 10 && tabY >= 0 && tabY < 10) {
+                // Se a habilidade afeta esta posição e não há navio
+                if (habilidade[i][j] == 1 && tabuleiro[tabX][tabY] == '0') {
+                    tabuleiro[tabX][tabY] = '5';
+                }
+            }
+        }
+    }
+}
+
+int main()
+{
+    // Matriz de 10x10
+    char tabuleiro[10][10];
+    // Inicializa o tabuleiro com o valor 0, representando a água
+    for (int i = 0; i < 10; i++)
+    {
+        for (int j = 0; j < 10; j++)
+        {
+            tabuleiro[i][j] = '0';
+        }
+    }
+
+    // Coordenadas e orientações dos navios
+    int inicioNavio1X = 2, inicioNavio1Y = 3; // Navio 1: horizontal
+    int inicioNavio2X = 5, inicioNavio2Y = 6; // Navio 2: vertical
+    int inicioNavio3X = 0, inicioNavio3Y = 0; // Navio 3: diagonal principal ↘
+    int inicioNavio4X = 0, inicioNavio4Y = 9; // Navio 4: diagonal secundária ↙
+    char orientacaoNavio1 = 'H';              // Horizontal
+    char orientacaoNavio2 = 'V';              // Vertical
+    char direcaoNavio3 = 'D';                 // Diagonal principal ↘
+    char direcaoNavio4 = 'E';                 // Diagonal secundária ↙
+    int tamanhoNavio = 3;                     // Tamanho fixo dos navios
+
+    // Validar e posicionar o primeiro navio (horizontal)
+    if (validarPosicao(tabuleiro, inicioNavio1X, inicioNavio1Y, tamanhoNavio, orientacaoNavio1))
+    {
+        posicionarNavio(tabuleiro, inicioNavio1X, inicioNavio1Y, tamanhoNavio, orientacaoNavio1);
+    }
+    else
+    {
+        printf("Erro: Não foi possível posicionar o primeiro navio.\n");
+        return 1;
+    }
+
+    // Validar e posicionar o segundo navio (vertical)
+    if (validarPosicao(tabuleiro, inicioNavio2X, inicioNavio2Y, tamanhoNavio, orientacaoNavio2))
+    {
+        posicionarNavio(tabuleiro, inicioNavio2X, inicioNavio2Y, tamanhoNavio, orientacaoNavio2);
+    }
+    else
+    {
+        printf("Erro: Não foi possível posicionar o segundo navio.\n");
+        return 1;
+    }
+
+    // Validar e posicionar o terceiro navio (diagonal principal ↘)
+    if (validarPosicaoDiagonal(tabuleiro, inicioNavio3X, inicioNavio3Y, tamanhoNavio, direcaoNavio3))
+    {
+        posicionarNavioDiagonal(tabuleiro, inicioNavio3X, inicioNavio3Y, tamanhoNavio, direcaoNavio3);
+    }
+    else
+    {
+        printf("Erro: Não foi possível posicionar o terceiro navio (diagonal ↘).\n");
+        return 1;
+    }
+
+    // Validar e posicionar o quarto navio (diagonal secundária ↙)
+    if (validarPosicaoDiagonal(tabuleiro, inicioNavio4X, inicioNavio4Y, tamanhoNavio, direcaoNavio4))
+    {
+        posicionarNavioDiagonal(tabuleiro, inicioNavio4X, inicioNavio4Y, tamanhoNavio, direcaoNavio4);
+    }
+    else
+    {
+        printf("Erro: Não foi possível posicionar o quarto navio (diagonal ↙).\n");
+        return 1;
+    }
+
+    // --- MATRIZES DE HABILIDADE (5x5) ---
+    int cone[5][5];      // Cone para baixo
+    int cruz[5][5];      // Cruz centrada
+    int octaedro[5][5];  // Octaedro (losango)
+
+    // Construção dinâmica do cone
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            // O cone expande para baixo: |j-2| <= i
+            cone[i][j] = (abs(j-2) <= i) ? 1 : 0;
+        }
+    }
+    // Construção dinâmica da cruz
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            cruz[i][j] = (i == 2 || j == 2) ? 1 : 0;
+        }
+    }
+    // Construção dinâmica do octaedro (losango)
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            octaedro[i][j] = (abs(i-2) + abs(j-2) <= 2) ? 1 : 0;
+        }
+    }
+
+    // --- PONTOS DE ORIGEM DAS HABILIDADES NO TABULEIRO ---
+    int origemConeX = 2, origemConeY = 2;         // Exemplo: canto superior esquerdo
+    int origemCruzX = 5, origemCruzY = 5;         // Exemplo: centro
+    int origemOctaedroX = 7, origemOctaedroY = 7; // Exemplo: canto inferior direito
+
+    // Aplica as áreas de efeito ao tabuleiro
+    aplicarHabilidade(tabuleiro, cone, origemConeX, origemConeY);
+    aplicarHabilidade(tabuleiro, cruz, origemCruzX, origemCruzY);
+    aplicarHabilidade(tabuleiro, octaedro, origemOctaedroX, origemOctaedroY);
+
+    // Exibir o tabuleiro no console
+    printf("Tabuleiro:\n");
+    for (int i = 0; i < 10; i++)
+    {
+        for (int j = 0; j < 10; j++)
+        {
+            // Exibe diferentes caracteres para cada elemento
+            if (tabuleiro[i][j] == '0')
+                printf("~ "); // Água
+            else if (tabuleiro[i][j] == '3')
+                printf("N "); // Navio
+            else if (tabuleiro[i][j] == '5')
+                printf("* "); // Área de efeito
+            else
+                printf("%c ", tabuleiro[i][j]);
+        }
+        printf("\n");
+    }
+    return 0;
+}
